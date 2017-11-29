@@ -1,6 +1,7 @@
+from datetime import datetime, timedelta
+import getopt
 import logging
 import sys
-import getopt
 
 from launcher import Launcher
 
@@ -17,11 +18,17 @@ def main(argv=None):
         argv = sys.argv
     try:
         try:
-            opts, args = getopt.getopt(argv[1:], 'h', ['help', 'log='])
+            opts, args = getopt.getopt(argv[1:], 'h', ['help', 'log=', 'start=', 'end='])
         except getopt.error as err:
              raise Usage(err.msg)
 
+        # Set default value for runtime settings.
         log_level = logging.WARNING
+
+        # TODO: should read start start and end from optional options.
+        start = datetime.now() - timedelta(days=1)
+        end = datetime.now()
+
         for opt in opts:
             opt_key = opt[0]
             if opt_key == '-h' or opt_key == '--help':
@@ -32,13 +39,14 @@ def main(argv=None):
                 if not isinstance(log_level, int):
                     raise ValueError('Invalid log level: %s' % opt[1])
 
+
         # Remove all handlers already associated with the root logger object.
         # Otherwise the basicConfig line below would not take effect.
         for handler in logging.root.handlers[:]:
             logging.root.removeHandler(handler)
         logging.basicConfig(format='%(asctime)s %(message)s', level=log_level)
 
-        Launcher().start()
+        Launcher().start(start, end)
 
     except Usage as err:
         logging.error(err.msg)

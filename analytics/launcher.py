@@ -8,7 +8,7 @@ class Launcher:
     def __init__(self):
         pass
 
-    def start(self):
+    def start(self, start, end):
         logging.info('Started processing configs, %d in total', len(CONFIGS))
 
         for config in CONFIGS:
@@ -16,10 +16,10 @@ class Launcher:
 
             for i in range(settings.MAX_TASK_RETRY_TIMES):
                 try:
-                    Task(config).run()
+                    Task.create_task(config).run(start, end)
                 except Exception as err:
                     logging.error('Unexpected exception: %r', err)
-                    if i == settings.MAX_TASK_RETRY_TIMES:
+                    if i == settings.MAX_TASK_RETRY_TIMES - 1:
                         raise
                     else:
                         logging.error('retry # %d', (i + 1))

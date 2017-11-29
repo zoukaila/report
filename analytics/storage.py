@@ -1,6 +1,6 @@
-import settings
+from pymongo import command_cursor, cursor, MongoClient, results
 
-from pymongo import MongoClient, command_cursor, cursor
+import settings
 
 class Storage:
     class __Storage:
@@ -16,7 +16,7 @@ class Storage:
         def insert_one(self, col_name, doc):
             return self.__db.get_collection(col_name).insert_one(doc)
 
-        def insert_many(self, col_name, docs):
+        def insert_many(self, col_name, docs) -> results.InsertManyResult:
             return self.__db.get_collection(col_name).insert_many(docs)
 
         def aggregate(self, col_name, pipeline) -> command_cursor.CommandCursor:
@@ -28,7 +28,7 @@ class Storage:
         raise SyntaxError('Please instantiate using get_instance')
 
     @classmethod
-    def get_instance(cls) -> Storage.__Storage:
+    def get_instance(cls):
         # TODO: not thread safe yet.
         if not cls.__singleton:
             cls.__singleton = cls.__Storage()
